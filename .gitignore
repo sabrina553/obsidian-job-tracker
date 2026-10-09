@@ -1,0 +1,20 @@
+# Per-device Obsidian state
+.obsidian/workspace.json
+.obsidian/workspace-mobile.json
+.obsidian/workspaces.json
+.obsidian/graph.json
+.obsidian/appearance.json
+.obsidian/hotkeys.json
+.obsidian/themes/
+.obsidian/snippets/
+
+# Plugin code is installed from the community browser; only ship Templater's settings
+.obsidian/plugins/*
+!.obsidian/plugins/templater-obsidian/
+.obsidian/plugins/templater-obsidian/*
+!.obsidian/plugins/templater-obsidian/data.json
+
+# Obsidian trash and OS clutter
+.trash/
+.DS_Store
+Thumbs.db

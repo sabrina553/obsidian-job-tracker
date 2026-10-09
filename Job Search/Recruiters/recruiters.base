@@ -1,0 +1,64 @@
+filters:
+  and:
+    - file.hasTag("recruiters")
+formulas:
+  action: if(status == "no response - moved on", "Moved on", if(["replied", "in conversation", "interviewing"].contains(status), "Active", if(!first_contact, "", if((today() - first_contact).days >= 14, "Switch contact", if(!next_follow_up, "", if(next_follow_up < today(), "Follow-up overdue", if(next_follow_up == today(), "Follow up today", "Waiting")))))))
+  days_since_contact: if(last_contact, (today() - last_contact).days, "")
+properties:
+  file.name:
+    displayName: Note
+  name:
+    displayName: Name
+  company:
+    displayName: Company
+  phone:
+    displayName: Phone
+  email:
+    displayName: Email
+  linkedin:
+    displayName: LinkedIn
+  first_contact:
+    displayName: First Contact
+  last_contact:
+    displayName: Last Contact
+  next_follow_up:
+    displayName: Next Follow-Up
+  status:
+    displayName: Status
+  formula.action:
+    displayName: Action
+  formula.days_since_contact:
+    displayName: Days Quiet
+views:
+  - type: table
+    name: All recruiters
+    order:
+      - file.name
+      - company
+      - phone
+      - email
+      - linkedin
+      - last_contact
+      - first_contact
+      - next_follow_up
+      - status
+      - formula.action
+      - formula.days_since_contact
+    sort:
+      - property: last_contact
+        direction: DESC
+      - property: next_follow_up
+        direction: ASC
+  - type: table
+    name: Contacted this week
+    filters:
+      and:
+        - first_contact >= today() - "7 days"
+    order:
+      - file.name
+      - company
+      - first_contact
+      - status
+      - formula.action
+    summaries:
+      file.name: Count
