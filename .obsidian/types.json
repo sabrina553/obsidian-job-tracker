@@ -1,0 +1,27 @@
+{
+  "types": {
+    "aliases": "aliases",
+    "cssclasses": "multitext",
+    "tags": "tags",
+    "company": "text",
+    "role": "text",
+    "job_url": "text",
+    "source": "text",
+    "via_recruiter": "checkbox",
+    "date_found": "date",
+    "date_applied": "date",
+    "status": "text",
+    "interview_stage": "text",
+    "recruiter": "text",
+    "cv_version": "text",
+    "location": "text",
+    "salary": "text",
+    "name": "text",
+    "phone": "text",
+    "email": "text",
+    "linkedin": "text",
+    "first_contact": "date",
+    "last_contact": "date",
+    "next_follow_up": "date"
+  }
+}

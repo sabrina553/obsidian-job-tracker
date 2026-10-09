@@ -1,0 +1,143 @@
+filters:
+  and:
+    - file.hasTag("job-applications")
+formulas:
+  daysSinceApplied: if(date_applied, ((number(today()) - number(date(date_applied))) / 86400000).floor(), null)
+  daysSinceFound: if(date_found, ((number(today()) - number(date(date_found))) / 86400000).floor(), null)
+  daysSinceModified: (now() - file.mtime).days.floor()
+  stage: |
+    if(!status, "6 · Other", if(status.lower().contains("not-applied"), "1 · Not Applied", if(status.lower().contains("decline") || status.lower().contains("reject"), "5 · Closed", if(status.lower().contains("offer"), "4 · Offer 🎉", if(status.lower().contains("interview"), "3 · Interviewing", if(status.lower().contains("appl") || status == "NRY", "2 · Applied", "6 · Other"))))))
+  Company: if(job_url, link(job_url, company), company)
+properties:
+  formula.daysSinceApplied:
+    displayName: Days since applied
+  formula.daysSinceFound:
+    displayName: Days since found
+  formula.daysSinceModified:
+    displayName: Days since modified
+  formula.stage:
+    displayName: Stage
+  formula.Company:
+    displayName: Company
+  interview_stage:
+    displayName: Interview stage
+  via_recruiter:
+    displayName: Via recruiter
+views:
+  - type: cards
+    name: Kanban Board
+    filters:
+      and:
+        - not:
+            - and:
+                - formula.stage == "5 · Closed"
+                - formula.daysSinceModified >= 14
+    groupBy:
+      property: formula.stage
+      direction: ASC
+    order:
+      - company
+      - role
+      - interview_stage
+      - formula.daysSinceModified
+  - type: table
+    name: Needs Follow-Up
+    filters:
+      and:
+        - formula.stage == "2 · Applied"
+        - formula.daysSinceApplied >= 7
+    order:
+      - file.name
+      - company
+      - role
+      - recruiter
+      - date_applied
+      - formula.daysSinceApplied
+    sort:
+      - property: formula.daysSinceApplied
+        direction: DESC
+  - type: table
+    name: This Week's Applications
+    filters:
+      and:
+        - date_applied
+        - date(date_applied).date() >= today() - "7d"
+    order:
+      - file.name
+      - company
+      - role
+      - date_applied
+      - source
+    sort:
+      - property: date_applied
+        direction: DESC
+  - type: table
+    name: Interviewing
+    filters:
+      and:
+        - formula.stage == "3 · Interviewing"
+    order:
+      - file.name
+      - company
+      - role
+      - interview_stage
+      - date_applied
+    sort:
+      - property: date_applied
+        direction: ASC
+  - type: table
+    name: Not Yet Applied
+    filters:
+      and:
+        - formula.stage == "1 · Not Applied"
+    order:
+      - file.name
+      - company
+      - role
+      - date_found
+      - formula.daysSinceFound
+    sort:
+      - property: formula.daysSinceFound
+        direction: DESC
+  - type: table
+    name: Declined / Rejected
+    filters:
+      and:
+        - formula.stage == "5 · Closed"
+    order:
+      - file.name
+      - company
+      - role
+      - status
+      - date_applied
+    sort:
+      - property: date_applied
+        direction: DESC
+  - type: table
+    name: Offers
+    filters:
+      and:
+        - formula.stage == "4 · Offer 🎉"
+    order:
+      - file.name
+      - company
+      - role
+      - salary
+      - date_applied
+  - type: table
+    name: Everything
+    order:
+      - file.name
+      - formula.Company
+      - role
+      - formula.stage
+      - status
+      - interview_stage
+      - via_recruiter
+      - date_applied
+      - formula.daysSinceApplied
+    sort:
+      - property: date_applied
+        direction: DESC
+    summaries:
+      file.name: Count
